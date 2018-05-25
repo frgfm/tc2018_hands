@@ -5,10 +5,10 @@ These functions were developped as part of the HANDS project for forest wildfire
 
 '''
 
-import numpy as np
+from azure.cognitiveservices.vision.customvision.prediction import prediction_endpoint
 
 
-def get_msvision_classif(img, api_credentials):
+def get_msvision_classif(img, api_credentials, model_setup):
 
     """
     Retrieve the classification result for the MS Vision API
@@ -18,18 +18,17 @@ def get_msvision_classif(img, api_credentials):
         api_credentials (dict): all credentials required to access the API 
 
     Returns:
-        pred_conf (np.array): predicted confidence for each class (index predefined)
+        pred_conf (dict): predicted confidence for each class
     """
 
     try:
-        #####################
-        # Your code here 
-        #####################
-        #pred_conf =
+        predictor = prediction_endpoint.PredictionEndpoint(api_credentials['prediction_key'])
+        results = predictor.predict_image(model_setup['project_id'], img, model_setup['iter_id'])
+        pred_conf = {}
+        for prediction in results.predictions:
+            pred_conf[prediction.tag_name] = prediction.probability
 
     except Exception:
         raise ValueError('Call to MS Vision API failed.')
-
-    pred_conf = np.asarray(pred_conf)
 
     return pred_conf
