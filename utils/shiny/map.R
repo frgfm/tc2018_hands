@@ -16,7 +16,7 @@
 
 rm(list=ls())
 cat("\014")
-setwd("C:/Users/fgfer/Documents/Hackathon/TC Vivatech/tc2018_hands")
+setwd("C:/Users/Mehdi/Desktop/tc2018_hands")
 
 library(shiny)
 library(shinythemes) #for beautiful themes
@@ -35,11 +35,17 @@ icon_fire = makeIcon(
   iconWidth = 21.8, iconHeight = 27.2
 )
 
+
 # Icone du camera
-# icon_camera = makeIcon(
-#   iconUrl = "./static/images/icon_camera_transparent.png",
-#   iconWidth = 20, iconHeight = 27.2
-# )
+icon_camera = makeIcon(
+  iconUrl = "./static/images/icon_camera_transparent.png",
+  iconWidth = 15, iconHeight = 10
+)
+
+# Position des cameras
+position_camera = data.frame(lat = c(43.1, 43.3, 44.5, 44.0, 43.3, 44.2, 43.5, 45.1, 44.3, 43.3),
+                             lng = c(6.5, 6.9, 6.8, 6.9, 5.7, 5.8, 6.4, 5.8, 6.5, 5.6))
+
 
 # == 2 - Application cartographique =======================
 
@@ -142,7 +148,7 @@ server = shinyServer(function(input, output, session) {
     invalidateLater(millis = 1000, session)
     vals$counter = isolate(vals$counter) + 1
     
-    fread("./static/images/geo_loc_on_fire.csv", data.table = FALSE, encoding = 'UTF-8')
+    fread("./static/geo_output/map_data.csv", data.table = FALSE, encoding = 'UTF-8')
     
   })
   
@@ -152,8 +158,10 @@ server = shinyServer(function(input, output, session) {
     # Fond de carte
     leaflet(options = leafletOptions(zoomControl = FALSE,  doubleClickZoom = FALSE, dragging = FALSE, minZoom = 7, maxZoom = 7)) %>%
       setView(lat= 43, lng = 7, zoom = 7) %>%
-      clearMarkers() %>%
-      clearShapes()
+      #clearMarkers() %>%
+      #clearShapes()
+      addMarkers(lat = position_camera$lat, lng = position_camera$lng, 
+                 icon = icon_camera) 
      # addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google')
     
   })
@@ -174,7 +182,7 @@ server = shinyServer(function(input, output, session) {
                  weight = 5,
                  color = "red",
                  stroke = FALSE,
-                 fillOpacity = .4,
+                 fillOpacity = .3,
                  radius = 5e4 * loc_fire_to_display()$proba) 
     }
       })
