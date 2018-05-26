@@ -38,14 +38,20 @@ icon_fire = makeIcon(
 # == 2 - Application cartographique =======================
 
 ui = fluidPage(
+  
+  #Favicon
+  tags$head(tags$link(rel="shortcut icon", href="favicon_transparent.png")),
+  
+  # Général style
   tags$style("body {background-color:#d5d5d5;}",
-             HTML('#panel_controls {background-color: #e4e4e4}')), 
+             HTML('#panel_controls {background-color: #e4e4e4}')), #only for panel_controls
   
   navbarPage(theme = shinytheme("spacelab"),
-             title=div(img(src="hand_logo.png",  
-                           width = "20%",
-                       style = "margin:-12px -12px"), #image in www folder
-  "Forest fire detection app"),
+             windowTitle = "Forest fire detection app",
+             title = div(img(src = "hand_logo.png", 
+                             width = "20%",
+                             style = "margin:-12px -12px"), #image in www folder
+                         "Forest fire detection app"),
                       
   # Beautiful graphics
   #tags$head(
@@ -53,60 +59,53 @@ ui = fluidPage(
     #includeCSS("./src/flatly_styles.css")
     #includeScript("./src/gomap.js")
   #),
-  
   column(width = 9,
          
          leafletOutput("mymap", height = 550, width = 950),
-  
-  # Panel contenant les informations relatives au site du détaillant
-  absolutePanel(id        = "panel_controls", 
-                class     = "panel panel-default", 
-                draggable = FALSE, 
-                top       = 70, #plus il est petit, plus il est haut
-                left      = 1000, 
-                width     = 350, 
-                height    = 550,
-                style = "color: #fff; border-color: #fff",
-                
-                h4(textOutput("snapshot"), align = "center"),
-                
-                h5(textOutput("text_device"), align = "center"),
-                
-                div(imageOutput("myimage", height = "200px"), style = "margin:12px 10px"),
-                
-                div(textOutput("info_device"), style = "margin:12px 90px"),
-                tags$head(tags$style("#info_device{color: red;
-                                 font-size: 15px}"
-                         )
-                ),
-                
-                div(actionButton(inputId = "call911", 
-                                 label = "Call 911",
-                                 icon = icon("earphone", lib = "glyphicon"), 
-                   # style = "margin:12px 120px"
-                    style="color: #fff; border-color: #000; margin:60px 120px; height:60px; width:120px;position:absolute;bottom:1em;")
-                )
-                
+         
+         # Panel contenant les informations relatives au site du détaillant
+         absolutePanel(id        = "panel_controls",
+                       class     = "panel panel-default", 
+                       draggable = FALSE, 
+                       top       = 70, #plus il est petit, plus il est haut
+                       left      = 1000, 
+                       width     = 350, 
+                       height    = 550,
+                       style     = "color: #fff; border-color: #fff",
+                       
+                       h4(textOutput("snapshot"), align = "center"),
+                       
+                       h5(textOutput("text_device"), align = "center"),
+                       
+                       div(imageOutput("myimage", height = "200px"), style = "margin:12px 10px"),
+                       
+                       div(textOutput("info_device"), style = "margin:12px 85px"),
+
+                       tags$head(tags$style("#info_device{color: red;font-weight: bold;font-size: 15px}")),
+                       
+                       div(actionButton(inputId = "call911", 
+                                        label = "Emergency call",
+                                        icon = icon("earphone", lib = "glyphicon"), 
+                                        style = "color: #fff; border-color: #000; margin:60px 90px; height:60px; width:180px;position:absolute;bottom:1em;")
+                           )
+                       )
+         )
   )
 )
-)
-)
-
 
 # == Server ====================================================
 
 server = shinyServer(function(input, output, session) {
   
   # Gonna read a file each second
-  vals <- reactiveValues(counter = 0)
+  vals = reactiveValues(counter = 0)
   
   # File containing fire localisation
   loc_fire_to_display = reactive({
     invalidateLater(millis = 1000, session)
-    vals$counter <- isolate(vals$counter) + 1
+    vals$counter = isolate(vals$counter) + 1
     
     fread("./static/images/geo_loc_on_fire.csv", data.table = FALSE, encoding = 'UTF-8')
-    
     
   })
   
@@ -184,8 +183,6 @@ server = shinyServer(function(input, output, session) {
     
     sprintf("Probability of fire : %.f%% ", 
           100 * loc_fire_to_display() %>% filter(name == click()$id) %>% select(proba))
-    
-   
   })
 })
 
