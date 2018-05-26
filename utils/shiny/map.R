@@ -35,6 +35,12 @@ icon_fire = makeIcon(
   iconWidth = 21.8, iconHeight = 27.2
 )
 
+# Icone du camera
+# icon_camera = makeIcon(
+#   iconUrl = "./static/images/icon_camera_transparent.png",
+#   iconWidth = 20, iconHeight = 27.2
+# )
+
 # == 2 - Application cartographique =======================
 
 ui = fluidPage(
@@ -68,10 +74,9 @@ ui = fluidPage(
            key: 'PsL-At-XpsPTZexBwUkO7Mx5I',
            
            // Optional: Initial state of the map
-           lat: 44,
-           lon: 6,
-           zoom: 6,
-
+           lat: 43,
+           lon: 7,
+           zoom: 7,
            }
            
            // Required: Windyty main function is called after
@@ -110,11 +115,12 @@ ui = fluidPage(
                        
                        div(imageOutput("myimage", height = "200px"), style = "margin:12px 10px"),
                        
-                       div(textOutput("info_device"), style = "margin:12px 85px"),
+                       div(textOutput("info_device"), style = "margin:12px 55px"),
 
                        tags$head(tags$style("#info_device{color: red;font-weight: bold;font-size: 15px}")),
                        
-                       div(actionButton(inputId = "call911", 
+                       div(tags$head(tags$script(src = "message-handler.js")),
+                           actionButton(inputId = "call911", 
                                         label = "Emergency call",
                                         icon = icon("earphone", lib = "glyphicon"), 
                                         style = "color: #fff; border-color: #000; margin:60px 90px; height:60px; width:180px;position:absolute;bottom:1em;")
@@ -144,9 +150,8 @@ server = shinyServer(function(input, output, session) {
   output$windyty <- renderLeaflet({
     
     # Fond de carte
-    leaflet(options = leafletOptions(zoomControl = FALSE, dragging = FALSE, 
-                                     minZoom = 6, maxZoom = 6)) %>%
-      setView(lat= 44, lng = 6, zoom = 6) %>%
+    leaflet(options = leafletOptions(zoomControl = FALSE,  doubleClickZoom = FALSE, dragging = FALSE, minZoom = 7, maxZoom = 7)) %>%
+      setView(lat= 43, lng = 7, zoom = 7) %>%
       clearMarkers() %>%
       clearShapes()
      # addTiles(urlTemplate = "http://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", attribution = 'Google')
@@ -168,8 +173,9 @@ server = shinyServer(function(input, output, session) {
                  lat  = loc_fire_to_display()$lat,
                  weight = 5,
                  color = "red",
-                 fillOpacity = 0.0,
-                 radius = 1e4 * loc_fire_to_display()$proba) 
+                 stroke = FALSE,
+                 fillOpacity = .4,
+                 radius = 5e4 * loc_fire_to_display()$proba) 
     }
       })
   
@@ -218,9 +224,15 @@ server = shinyServer(function(input, output, session) {
     if(is.null(input$windyty_marker_click))
       return()
     
-    sprintf("Probability of fire : %.f%% ", 
+    sprintf("Fire outbreak probability : %.f%% ", 
           100 * loc_fire_to_display() %>% filter(name == click()$id) %>% select(proba))
   })
+  
+  observeEvent(input$call911, {
+    session$sendCustomMessage(type = 'testmessage',
+                              message = 'Calling ...')
+  })
+  
 })
 
 # == Application ==============================================
