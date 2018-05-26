@@ -7,10 +7,10 @@ These functions were developped as part of the HANDS project for forest wildfire
 
 import numpy as np
 import pandas as pd
+import os
 
-(44.3, 6)
 
-def export_map_data(device_names, labs, confs, timestamps):
+def export_map_data(device_names, gps, confs, timestamps):
 
     """
     Provide the user with visualization for false positives
@@ -21,11 +21,9 @@ def export_map_data(device_names, labs, confs, timestamps):
         img (ndarray): image with drawn rectangles
     """
 
-    lat;lng;name;proba;timestamp
-
-    data_dict = {'lat': gps[0], 'lon': gps[1], 'name': device_names, 'proba': confs, 'timestamp': timestamps}
+    data_dict = {'lat': gps[:, 0], 'lng': gps[:, 1], 'name': device_names, 'proba': confs, 'timestamp': timestamps}
 
     df = pd.DataFrame.from_dict(data_dict)
-    
 
-    return resized_img
+    save_path = os.path.join('static', 'geo_output', 'map_data.csv')
+    df.to_csv(save_path, sep=';', index=False)
