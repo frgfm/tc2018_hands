@@ -9,6 +9,22 @@ import numpy as np
 import cv2
 
 
+def resize_img(img, max_side_pxl):
+
+    """
+    Provide the user with visualization for false positives
+    Args:
+        img (ndarray): input image
+        max_side_pxl (int): number of pixels on the longest side of the output image
+    Returns:
+        img (ndarray): image with drawn rectangles
+    """
+    aspect_ratio = float(max_side_pxl) / float(np.max(img.shape[:2]))
+    resized_img = cv2.resize(img, None, None, fx=aspect_ratio, fy=aspect_ratio,
+                             interpolation=cv2.INTER_LINEAR)
+
+    return resized_img
+
 def add_boxes(img, boxes, labels=None, line_width=3, font_size=1, color=(0, 0, 255), label_out=True, label_top=True):
 
     """

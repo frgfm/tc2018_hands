@@ -16,7 +16,7 @@
 
 rm(list=ls())
 cat("\014")
-setwd("C:/Users/Mehdi/Desktop/Vivatech_hand/src/tc2018_hands")
+setwd("C:/Users/fgfer/Documents/Hackathon/TC Vivatech/tc2018_hands")
 
 library(shiny)
 library(shinythemes) #for beautiful themes
